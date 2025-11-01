@@ -4,6 +4,8 @@
 ### Custom ###
 docs/origin_src/**
 docs/origin_src/
+.vscode/
+test*.*
 
 ### dotenv ###
 .env
