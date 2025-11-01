@@ -2,7 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=dotenv,python,visualstudiocode,nextjs,react
 
 ### Custom ###
-docs/origin_src/**.*
+docs/origin_src/**
+docs/origin_src/
 
 ### dotenv ###
 .env
