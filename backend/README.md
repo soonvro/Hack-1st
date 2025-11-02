@@ -41,6 +41,13 @@ cd backend
 pip install -e .
 ```
 
+또는 uv를 사용하는 경우:
+
+```bash
+cd backend
+uv sync
+```
+
 ### 2. 환경 설정
 
 ```bash
@@ -50,39 +57,46 @@ cp .env.example .env
 
 Google AI API 키는 [Google AI Studio](https://makersuite.google.com/app/apikey)에서 발급받을 수 있습니다.
 
-### 3. 실행
+### 3. FastAPI 서버 실행
 
 ```bash
-python -m backend
+cd backend
+python run_server.py
 ```
 
-또는:
+또는 직접 uvicorn 실행:
 
 ```bash
-backend
+uvicorn src.backend.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-### 4. Python 코드에서 사용
+서버 실행 후 다음 주소로 접속:
+- API 서버: http://localhost:8080
+- API 문서: http://localhost:8080/docs
+- 헬스 체크: http://localhost:8080/health
+
+### 4. Python 코드에서 직접 사용
 
 ```python
-from backend import run_navigator
+from backend.agents.workflow import run_workflow
+from backend.agents.schemas import PersonalInfo, ProjectInfo
 
-personal_info = {
-    "gender": "여성",
-    "age": 32,
-    "mbti": "ENFJ",
-    "previous_company": "카카오",
-    "previous_position": "마케팅",
-    "startup_experience": True
-}
+personal_info = PersonalInfo(
+    gender="여성",
+    age=32,
+    mbti="ENFJ",
+    previous_job="마케터",
+    self_employed_experience=True
+)
 
-project_info = {
-    "food_sector": ["베이커리", "카페", "양식"],
-    "region": "마포구",
-    "capital": 50000000
-}
+project_info = ProjectInfo(
+    food_sector="카페",
+    region="강남구",
+    capital="30000000원 ~ 50000000원"
+)
 
-result = run_navigator(personal_info, project_info)
+final_report = run_workflow(personal_info, project_info)
+print(final_report.executive_summary)
 ```
 
 ## 프로젝트 구조
@@ -117,33 +131,88 @@ backend/
 
 ## API 문서
 
-### run_navigator()
+### REST API Endpoints
+
+#### POST /api/submit
+
+창업 계획을 제출하고 분석 결과를 받습니다.
+
+**요청 본문:**
+
+```json
+{
+  "personalInfo": {
+    "name": "홍길동",
+    "gender": "m",
+    "age": 34,
+    "mbti": "ENTJ",
+    "previous_job": "마케터",
+    "self_employed_experience": true
+  },
+  "projectInfo": {
+    "foodSector": "카페",
+    "region": "강남구",
+    "capital": 50000000
+  }
+}
+```
+
+**응답:**
+
+```json
+{
+  "executive_summary": "창업 컨설팅 종합 보고서...",
+  "persona_profile": { ... },
+  "market_analysis": { ... },
+  "recommended_items": [ ... ],
+  "roadmaps": [ ... ]
+}
+```
+
+**cURL 예시:**
+
+```bash
+curl -X POST http://localhost:8080/api/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "personalInfo": {
+      "name": "홍길동",
+      "gender": "m",
+      "age": 34,
+      "mbti": "ENTJ",
+      "previous_job": "마케터",
+      "self_employed_experience": true
+    },
+    "projectInfo": {
+      "foodSector": "카페",
+      "region": "강남구",
+      "capital": 50000000
+    }
+  }'
+```
+
+### Python SDK
+
+#### run_workflow()
 
 ```python
-def run_navigator(
-    personal_info: dict,
-    project_info: dict,
-    output_path: Path | None = None
-) -> dict:
+from backend.agents.workflow import run_workflow
+from backend.agents.schemas import PersonalInfo, ProjectInfo, FinalReport
+
+def run_workflow(
+    personal_info: dict | PersonalInfo,
+    project_info: dict | ProjectInfo
+) -> FinalReport:
     """
-    F&B Startup Navigator를 실행합니다.
+    F&B Startup Navigator 워크플로우를 실행합니다.
     
     Args:
         personal_info: 사용자 개인 정보
         project_info: 프로젝트 정보
-        output_path: 결과 저장 경로 (선택)
     
     Returns:
-        최종 보고서 딕셔너리
+        FinalReport: 최종 분석 보고서
     """
-```
-
-### MasterOrchestrator
-
-```python
-orchestrator = MasterOrchestrator()
-report = orchestrator.run(personal_info, project_info)
-# FinalReport 객체 반환
 ```
 
 ## 개발
