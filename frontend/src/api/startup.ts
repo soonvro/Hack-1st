@@ -124,7 +124,7 @@ export interface Roadmap {
 export interface FinalReport {
   executive_summary: string;
   persona_profile: PersonaProfile;
-  market_analysis: MarketAnalysis;
+  market_analysis_list: MarketAnalysis[];
   recommended_items: RecommendedItem[];
   roadmaps: Roadmap[];
 }

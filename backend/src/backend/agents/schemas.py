@@ -156,7 +156,7 @@ class FinalReport(BaseModel):
 
     executive_summary: str = Field(description="요약")
     persona_profile: PersonaProfile = Field(description="창업자 페르소나")
-    market_analysis: MarketAnalysis = Field(description="시장 분석")
+    market_analysis_list: list[MarketAnalysis] = Field(description="시장 분석 리스트")
     recommended_items: list[RecommendedItem] = Field(description="추천 아이템 TOP 3")
     roadmaps: list[Roadmap] = Field(description="상세 로드맵")
 

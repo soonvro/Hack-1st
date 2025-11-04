@@ -7,6 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Flag, Lightbulb, MapPin, Utensils, Package, ExternalLink, TrendingUp, Users, Star, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useFormContext } from "@/contexts/FormContext";
 import { FundingTools } from "@/components/roadmap/FundingTools";
 import { LocationTools } from "@/components/roadmap/LocationTools";
@@ -31,6 +34,7 @@ export default function Roadmap() {
   const [checklistStates, setChecklistStates] = useState<Record<string, boolean>>({});
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [selectedRoadmapIndex, setSelectedRoadmapIndex] = useState(0);
+  const [showAgentModal, setShowAgentModal] = useState(false);
 
   // Check if reportData exists, if not redirect
   useEffect(() => {
@@ -262,12 +266,48 @@ export default function Roadmap() {
   // Get recommended item for current roadmap
   const currentRecommendedItem = reportData.recommended_items[selectedRoadmapIndex];
 
+  const agentSections = [
+    {
+      key: "profiler",
+      title: "Profiler Agent",
+      data: reportData?.persona_profile
+    },
+    {
+      key: "market",
+      title: "Market Analyst Agent",
+      data: reportData?.market_analysis_list
+    },
+    {
+      key: "validator",
+      title: "Idea Validator Agent",
+      data: reportData?.recommended_items
+    },
+    {
+      key: "architect",
+      title: "Roadmap Architect Agent",
+      data: reportData?.roadmaps
+    }
+  ];
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      // noop
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50/30 to-background py-8 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* 헤더 */}
         <div className="space-y-3">
-          <h1 className="text-5xl md:text-6xl font-bold">나의 창업 로드맵</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-5xl md:text-6xl font-bold">나의 창업 로드맵</h1>
+            <Button variant="outline" onClick={() => setShowAgentModal(true)} className="mt-1">
+              에이전트 활동 보기
+            </Button>
+          </div>
         </div>
 
         {/* 페르소나 프로필 */}
@@ -606,6 +646,40 @@ export default function Roadmap() {
             })}
           </Tabs>
         </div>
+      <Dialog open={showAgentModal} onOpenChange={setShowAgentModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>에이전트 활동 결과 (FinalReport)</DialogTitle>
+            <DialogDescription>
+              각 에이전트의 결과를 JSON 형식으로 확인할 수 있습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <Accordion type="single" collapsible className="w-full">
+              {agentSections.map(section => {
+                const jsonText = JSON.stringify(section.data ?? {}, null, 2);
+                return (
+                  <AccordionItem key={section.key} value={section.key}>
+                    <AccordionTrigger className="text-left text-lg font-semibold">
+                      {section.title}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="mb-2 flex justify-end">
+                        <Button variant="secondary" size="sm" onClick={() => handleCopy(jsonText)}>
+                          복사하기
+                        </Button>
+                      </div>
+                      <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto">
+{jsonText}
+                      </pre>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ GEMINI_PRO_MODEL = "gemini-2.5-pro"
 
 
 profiler_agent = Agent(
-    model=LiteLlm(model=QWEN_MODEL, api_key=BEDROCK_API_KEY),
+    model=GEMINI_PRO_MODEL,
     name="profiler_agent",
     description="personalInfo JSON 입력을 기반으로 사용자의 창업 성향, 강점, 약점, 리스크 수용도를 분석하여 '창업자 페르소나 프로필'(PersonaProfile)을 생성합니다.",
     instruction=(
@@ -68,7 +68,7 @@ profiler_agent = Agent(
 
 
 market_analyst_agent = Agent(
-    model=LiteLlm(model=QWEN_MODEL, api_key=BEDROCK_API_KEY),
+    model=GEMINI_PRO_MODEL,
     # model=GEMINI_PRO_MODEL,
     name="market_analyst_agent",
     description=(
@@ -113,7 +113,7 @@ market_analyst_agent = Agent(
 
 
 item_recommender_agent = Agent(
-    model=LiteLlm(model=QWEN_MODEL, api_key=BEDROCK_API_KEY),
+    model=GEMINI_PRO_MODEL,
     name="item_recommender_agent",
     description=(
 """

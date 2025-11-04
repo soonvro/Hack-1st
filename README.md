@@ -548,14 +548,16 @@ Content-Type: application/json
     weaknesses: string[];
     suitable_business_types: string[];
   };
-  market_analysis: {
-    dong: string;
-    demographics: string;
-    avg_rent: string;
-    foot_traffic: string;
-    emerging_trends: string[];
-    market_opportunities: string[];
-  };
+  market_analysis_list: [                          // 동별 시장 분석 리스트
+    {
+      dong: string;
+      demographics: string;
+      avg_rent: string;
+      foot_traffic: string;
+      emerging_trends: string[];
+      market_opportunities: string[];
+    }
+  ];
   recommended_items: [                          // TOP 3 추천 아이템
     {
       item: string;
