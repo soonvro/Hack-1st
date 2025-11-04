@@ -2,7 +2,7 @@
  * API client for F&B Startup Navigator backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://211.188.62.28:8080";
 
 // ============================================================================
 // Request Types
