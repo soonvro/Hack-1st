@@ -2,7 +2,7 @@
  * API client for F&B Startup Navigator backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4242";
 
 // ============================================================================
 // Request Types
@@ -124,7 +124,7 @@ export interface Roadmap {
 export interface FinalReport {
   executive_summary: string;
   persona_profile: PersonaProfile;
-  market_analysis: MarketAnalysis;
+  market_analysis_list: MarketAnalysis[];
   recommended_items: RecommendedItem[];
   roadmaps: Roadmap[];
 }

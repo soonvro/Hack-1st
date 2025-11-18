@@ -163,7 +163,7 @@ backend/
 {
   "executive_summary": "창업 컨설팅 종합 보고서...",
   "persona_profile": { ... },
-  "market_analysis": { ... },
+  "market_analysis_list": [ ... ],
   "recommended_items": [ ... ],
   "roadmaps": [ ... ]
 }

@@ -38,7 +38,7 @@ def _extract_final_response(events) -> dict:
 
 def _generate_executive_summary(
     persona: PersonaProfile,
-    market: MarketAnalysis,
+    market_list: list[MarketAnalysis],
     items: list[RecommendedItem],
     roadmaps: list[Roadmap],
 ) -> str:
@@ -48,6 +48,23 @@ def _generate_executive_summary(
     if not top_item:
         return "창업 아이템 분석이 완료되었습니다."
     
+    # Use the first market analysis for summary, or aggregate if multiple
+    market_info = ""
+    if market_list:
+        if len(market_list) == 1:
+            market = market_list[0]
+            market_info = f"""
+### 시장 분석 결과
+분석 지역: {market.dong}
+- {market.demographics}
+- 주요 트렌드: {', '.join(market.emerging_trends[:2])}"""
+        else:
+            dong_names = [m.dong for m in market_list[:3]]
+            market_info = f"""
+### 시장 분석 결과
+분석 지역: {', '.join(dong_names)}{' 외' if len(market_list) > 3 else ''} ({len(market_list)}개 동)
+- 총 {len(market_list)}개 동에 대한 상세 시장 분석 완료"""
+    
     summary = f"""
 ## 창업 컨설팅 종합 보고서
 
@@ -55,11 +72,7 @@ def _generate_executive_summary(
 {persona.persona_summary}
 - 리스크 수용도: {persona.risk_tolerance}
 - 주요 강점: {', '.join(persona.strengths[:2])}
-
-### 시장 분석 결과
-분석 지역: {market.dong}
-- {market.demographics}
-- 주요 트렌드: {', '.join(market.emerging_trends[:2])}
+{market_info}
 
 ### 최우선 추천 아이템
 **{top_item.item}**
@@ -180,22 +193,24 @@ async def run_workflow_async(
         RecommendedItem(**item) for item in recommended_items
     ]
     
-    # Select the most relevant market analysis (first one from the list)
+    # Convert market analysis list to Pydantic objects
     market_analyses = market_analysis_list["market_analyses"]
     if not market_analyses:
         raise ValueError("No market analysis data available")
-    market_analysis_obj = MarketAnalysis(**market_analyses[0])
+    market_analysis_objs = [
+        MarketAnalysis(**market_analysis) for market_analysis in market_analyses
+    ]
     
     # Step 5: Generate executive summary
     executive_summary = _generate_executive_summary(
-        persona_profile_obj, market_analysis_obj, recommended_items_objs, roadmaps
+        persona_profile_obj, market_analysis_objs, recommended_items_objs, roadmaps
     )
     
     # Step 6: Create and return FinalReport
     final_report = FinalReport(
         executive_summary=executive_summary,
         persona_profile=persona_profile_obj,
-        market_analysis=market_analysis_obj,
+        market_analysis_list=market_analysis_objs,
         recommended_items=recommended_items_objs,
         roadmaps=roadmaps,
     )
